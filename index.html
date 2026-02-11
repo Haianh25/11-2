@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --google-blue: #4285f4;
+            --google-red: #ea4335;
+            --google-yellow: #fbbc05;
+            --google-green: #34a853;
+            --bg-color: #ffffff;
+            --text-color: #202124;
+            --border-color: #dfe1e5;
+            --result-title: #1a0dab;
+            --result-link: #202124;
+            --result-desc: #4d5156;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .view {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        .view.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            height: 100%;
+        }
+
+        /* --- Search View (Homepage) --- */
+        #search-view {
+            height: 100%;
+        }
+
+        .header {
+            height: 60px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-right a {
+            text-decoration: none;
+            color: rgba(0, 0, 0, 0.87);
+            font-size: 13px;
+        }
+
+        .header-right a:hover {
+            text-decoration: underline;
+        }
+
+        .sign-in {
+            background-color: var(--google-blue);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px;
+        }
+
+        .logo {
+            font-size: 90px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            letter-spacing: -5px;
+        }
+
+        .blue {
+            color: var(--google-blue);
+        }
+
+        .red {
+            color: var(--google-red);
+        }
+
+        .yellow {
+            color: var(--google-yellow);
+        }
+
+        .green {
+            color: var(--google-green);
+        }
+
+        .search-box-container {
+            width: 100%;
+            max-width: 584px;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 10px 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .search-box:hover {
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+            border-color: rgba(223, 225, 229, 0);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 0 10px;
+        }
+
+        .search-box .search-icon {
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>') no-repeat center;
+            opacity: 0.5;
+        }
+
+        .mic-icon {
+            width: 24px;
+            height: 24px;
+            background: url('https://www.gstatic.com/images/branding/googlemic/2x/googlemic_color_24dp.png') no-repeat center;
+            background-size: contain;
+            cursor: pointer;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .buttons button {
+            background-color: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            border-radius: 4px;
+            color: #3c4043;
+            font-size: 14px;
+            padding: 0 16px;
+            line-height: 36px;
+            min-width: 54px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .buttons button:hover {
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+            border: 1px solid #dadce0;
+            color: #202124;
+        }
+
+        .language {
+            font-size: 13px;
+            color: #4d5156;
+        }
+
+        .language a {
+            text-decoration: none;
+            color: #1a0dab;
+            margin-left: 5px;
+        }
+
+        /* --- Results View --- */
+        #results-view {
+            background-color: #fff;
+            overflow-y: auto;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #ebebeb;
+            gap: 40px;
+            flex-shrink: 0;
+        }
+
+        .results-logo {
+            font-size: 30px;
+            font-weight: 500;
+            letter-spacing: -2px;
+            cursor: pointer;
+        }
+
+        .results-search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 8px 20px;
+            width: 630px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .results-search-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 20px;
+            background-color: #dfe1e5;
+        }
+
+        .search-icon-results {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml;utf8,<svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%234285f4" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>') no-repeat center;
+        }
+
+        .results-container {
+            padding: 20px 170px;
+            max-width: 1200px;
+        }
+
+        .search-stats {
+            font-size: 14px;
+            color: #70757a;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .result-link {
+            font-size: 14px;
+            color: var(--result-link);
+            margin-bottom: 4px;
+        }
+
+        .result-item h3 {
+            font-size: 20px;
+            color: var(--result-title);
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .result-item h3:hover {
+            text-decoration: underline;
+        }
+
+        .result-item p {
+            font-size: 14px;
+            color: var(--result-desc);
+            line-height: 1.58;
+        }
+
+        .recommended {
+            border-left: 4px solid var(--google-blue);
+            padding-left: 15px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .recommended:hover {
+            transform: scale(1.02);
+            background-color: #f1f3f4;
+        }
+
+        .recommended-title {
+            color: var(--google-blue) !important;
+            font-weight: 600 !important;
+        }
+
+        /* --- Invitation View --- */
+        #invitation-view {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .invitation-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invitation-card h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #d81b60;
+        }
+
+        .intro-text {
+            font-size: 18px;
+            color: #4a148c;
+            margin-bottom: 40px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .options button {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        #yes-btn {
+            background-color: #ff4081;
+            color: white;
+        }
+
+        #yes-btn:hover {
+            transform: scale(1.1);
+            background-color: #f50057;
+        }
+
+        #no-btn {
+            background-color: #e0e0e0;
+            color: #616161;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #success-msg {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #2e7d32;
+            font-weight: 500;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .results-container {
+                padding: 20px;
+            }
+
+            .results-search-box {
+                width: auto;
+                flex: 1;
+            }
+
+            .results-logo {
+                display: none;
+            }
+
+            .logo {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-container">
+        <!-- Google Homepage View -->
+        <section id="search-view" class="view active">
+            <div class="header">
+                <div class="header-right">
+                    <a href="#">Gmail</a>
+                    <a href="#">Hình ảnh</a>
+                    <div class="apps-icon"></div>
+                    <button class="sign-in">Sign in</button>
+                </div>
+            </div>
+            <div class="content">
+                <div class="logo">
+                    <span class="blue">G</span>
+                    <span class="red">o</span>
+                    <span class="yellow">o</span>
+                    <span class="blue">g</span>
+                    <span class="green">l</span>
+                    <span class="red">e</span>
+                </div>
+                <div class="search-box-container">
+                    <div class="search-box">
+                        <div class="search-icon"></div>
+                        <input type="text" id="search-input" readonly>
+                        <div class="mic-icon"></div>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button id="search-btn">Google Search</button>
+                    <button id="lucky-btn">I'm Feeling Lucky</button>
+                </div>
+                <div class="language">
+                    Google offered in: <a href="#">English</a> <a href="#">Tiếng Việt</a> <a href="#">Français</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Google Results View -->
+        <section id="results-view" class="view">
+            <div class="results-header">
+                <div class="results-logo" id="back-to-home">
+                    <span class="blue">G</span>
+                    <span class="red">o</span>
+                    <span class="yellow">o</span>
+                    <span class="blue">g</span>
+                    <span class="green">l</span>
+                    <span class="red">e</span>
+                </div>
+                <div class="results-search-box">
+                    <input type="text" id="results-input" value="What should Bống do tonight" readonly>
+                    <div class="results-search-icons">
+                        <div class="clear-icon"></div>
+                        <div class="divider"></div>
+                        <div class="mic-icon"></div>
+                        <div class="search-icon-results"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="results-container">
+                <p class="search-stats">About 1,270,000,000 results (0.54 seconds)</p>
+
+                <div class="result-item" id="stay-home">
+                    <div class="result-link">https://www.bored.com › stay-home</div>
+                    <h3>Hit the gym ❌</h3>
+                    <p>Going to the gym when Bống is tired? Not a good idea.</p>
+                </div>
+
+                <div class="result-item" id="sleep">
+                    <div class="result-link">https://www.lazy.com › sleep</div>
+                    <h3>Sleep ❌</h3>
+                    <p>Mít knows Bống is tired, but what about having dinner with Mít and then going to sleep?</p>
+                </div>
+
+                <div class="result-item recommended" id="go-out">
+                    <div class="result-link">https://www.date.com › go-out-with-mít</div>
+                    <h3 class="recommended-title">Go out with Mít ⭐⭐⭐⭐⭐ (Recommended)</h3>
+                    <p>Going out with Mít is the best choice for tonight! A fun time with Mít is guaranteed to make
+                        Bống feel better. Click to see the plan!</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const luckyBtn = document.getElementById('lucky-btn');
+            const searchView = document.getElementById('search-view');
+            const resultsView = document.getElementById('results-view');
+            const invitationView = document.getElementById('invitation-view');
+            const goOutResult = document.getElementById('go-out');
+            const yesBtn = document.getElementById('yes-btn');
+            const noBtn = document.getElementById('no-btn');
+            const successMsg = document.getElementById('success-msg');
+            const optionsDiv = document.querySelector('.options');
+            const backToHome = document.getElementById('back-to-home');
+
+            const searchText = "What should Bống do tonight";
+            let charIndex = 0;
+
+            // Simulated Typing
+            function typeEffect() {
+                if (charIndex < searchText.length) {
+                    searchInput.value += searchText.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeEffect, 100);
+                } else {
+                    // Auto trigger search after typing - Wait 3 seconds to simulate "searching"
+                    setTimeout(showResults, 3000);
+                }
+            }
+
+            function showResults() {
+                searchView.classList.remove('active');
+                setTimeout(() => {
+                    resultsView.classList.add('active');
+                }, 800);
+            }
+
+            function showInvitation() {
+                resultsView.classList.remove('active');
+                setTimeout(() => {
+                    window.location.href = 'timeline.html';
+                }, 500);
+            }
+
+            // Event Listeners
+            setTimeout(typeEffect, 1000); // Start typing after 1s
+
+            searchBtn.addEventListener('click', showResults);
+            luckyBtn.addEventListener('click', showResults);
+            goOutResult.addEventListener('click', showInvitation);
+
+            backToHome.addEventListener('click', () => {
+                resultsView.classList.remove('active');
+                searchView.classList.add('active');
+                searchInput.value = "";
+                charIndex = 0;
+                setTimeout(typeEffect, 1000);
+            });
+
+            yesBtn?.addEventListener('click', () => {
+                optionsDiv.classList.add('hidden');
+                successMsg.classList.remove('hidden');
+                startConfetti();
+            });
+
+            // Handle "No" button - it runs away!
+            noBtn?.addEventListener('mouseover', () => {
+                const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+                const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = `${x}px`;
+                noBtn.style.top = `${y}px`;
+            });
+
+            // Background Hearts for Invitation
+            function createHearts() {
+                const container = document.querySelector('.hearts-container');
+                if (!container) return;
+
+                for (let i = 0; i < 20; i++) {
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '❤️';
+                    heart.style.position = 'absolute';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.top = Math.random() * 100 + '%';
+                    heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                    heart.style.opacity = Math.random() * 0.5;
+                    heart.style.animation = `float ${Math.random() * 3 + 2}s infinite ease-in-out`;
+                    container.appendChild(heart);
+                }
+            }
+
+            function startConfetti() {
+                // Background success animations could be enhanced
+                console.log("Confetti effect triggered!");
+            }
+        });
+    </script>
+</body>
+
+</html>

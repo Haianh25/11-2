@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Plan for Bống</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --spring-green: #a8e6cf;
+            --soft-yellow: #fdffab;
+            --cherry-pink: #ffd3b6;
+            --leaf-green: #56776c;
+            --flower-pink: #ffaaa5;
+            --bg-gradient: linear-gradient(135deg, #f0fff4 0%, #fff9db 100%);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            color: var(--leaf-green);
+        }
+
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            padding: 50px;
+            border-radius: 40px;
+            box-shadow: 0 15px 40px rgba(86, 119, 108, 0.1);
+            text-align: center;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--leaf-green);
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-style: italic;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 40px;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 40px 0;
+            text-align: left;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: linear-gradient(to bottom, var(--spring-green), var(--cherry-pink));
+            border-radius: 1px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 45px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item::before {
+            content: '🌿';
+            position: absolute;
+            left: -53px;
+            top: 2px;
+            font-size: 1.2rem;
+            background: transparent;
+            z-index: 1;
+        }
+
+        .time {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--flower-pink);
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .activity {
+            font-size: 1.1rem;
+            color: var(--leaf-green);
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .invitation {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(86, 119, 108, 0.1);
+        }
+
+        .invitation p {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            margin-bottom: 35px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            height: 60px;
+        }
+
+        .btn {
+            padding: 14px 35px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #yes-btn {
+            background: var(--flower-pink);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 170, 165, 0.4);
+        }
+
+        #yes-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(255, 170, 165, 0.5);
+        }
+
+        #no-btn {
+            background: transparent;
+            color: var(--leaf-green);
+            border: 1px solid var(--leaf-green);
+            opacity: 0.6;
+        }
+
+        #success-msg {
+            display: none;
+            margin-top: 40px;
+            color: var(--leaf-green);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-style: italic;
+            animation: blossom 1s forwards;
+        }
+
+        @keyframes blossom {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            user-select: none;
+        }
+
+        /* Floating décor */
+        .decor {
+            position: absolute;
+            font-size: 2.5rem;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.3;
+            animation: drift 6s infinite ease-in-out;
+        }
+
+        @keyframes drift {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0);
+            }
+
+            50% {
+                transform: translate(15px, -30px) rotate(15deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="decor" style="top: 5%; left: 8%;">🍃</div>
+    <div class="decor" style="bottom: 15%; right: 10%; animation-delay: 1.5s;">🌼</div>
+    <div class="decor" style="top: 25%; right: 5%; animation-delay: 3s;">🌱</div>
+    <div class="decor" style="bottom: 5%; left: 12%; animation-delay: 4.5s;">🌷</div>
+
+    <div class="container">
+        <div class="subtitle">A Special Spring Night</div>
+        <h1>Tonight's Plan</h1>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <span class="time">20:00</span>
+                <span class="activity">📍 Mít will arrive at Bống's place.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">20:30</span>
+                <span class="activity">🍽️ Going out for dinner.</span>
+            </div>
+
+            <div class="timeline-item">
+                <span class="time">22:00</span>
+                <span class="activity">🏠 Mít drops Bống off at home.</span>
+            </div>
+        </div>
+
+        <div class="invitation">
+            <p>Would Bống like to go through with this plan with Mít? ✨</p>
+            <div class="btn-group">
+                <button id="yes-btn" class="btn">Count me in!</button>
+                <button id="no-btn" class="btn">Let me think...</button>
+            </div>
+        </div>
+
+        <div id="success-msg">
+            🌸 Awesome, see you tonight Bống!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.timeline-item');
+            const yesBtn = document.getElementById('yes-btn');
+            const noBtn = document.getElementById('no-btn');
+            const successMsg = document.getElementById('success-msg');
+            const invitation = document.querySelector('.invitation');
+
+            // Sequential appearance for timeline
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, (index + 1) * 700);
+            });
+
+            // Running "No" button logic
+            noBtn.addEventListener('mouseover', () => {
+                const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+                const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = x + 'px';
+                noBtn.style.top = y + 'px';
+                noBtn.style.zIndex = '9999';
+            });
+
+            yesBtn.addEventListener('click', () => {
+                invitation.style.display = 'none';
+                successMsg.style.display = 'block';
+                spawnPetals();
+            });
+
+            function spawnPetals() {
+                const emojis = ['🌸', '🍃', '✨', '🌼', '🌷'];
+                for (let i = 0; i < 50; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    petal.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                    petal.style.left = Math.random() * 100 + 'vw';
+                    petal.style.fontSize = Math.random() * 20 + 10 + 'px';
+                    petal.style.top = '-20px';
+                    document.body.appendChild(petal);
+
+                    const animation = petal.animate([
+                        { transform: `translateY(0) rotate(0deg) translateX(0)`, opacity: 1 },
+                        { transform: `translateY(110vh) rotate(${Math.random() * 720}deg) translateX(${(Math.random() - 0.5) * 500}px)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 4000 + 3000,
+                        easing: 'linear'
+                    });
+
+                    animation.onfinish = () => petal.remove();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

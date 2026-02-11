@@ -416,7 +416,45 @@
             }
         }
 
-        /* Mobile adjustments */
+        /* iPhone specific overrides */
+        body.iphone-view .header-right a {
+            display: none;
+        }
+
+        body.iphone-view .logo {
+            font-size: 80px;
+            margin-top: 40px;
+        }
+
+        body.iphone-view .search-box {
+            margin: 0 10px;
+        }
+
+        body.iphone-view .buttons {
+            flex-direction: column;
+            width: 90%;
+            gap: 10px;
+        }
+
+        body.iphone-view .buttons button {
+            width: 100%;
+            padding: 12px;
+        }
+
+        body.iphone-view .results-header {
+            padding: 15px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        body.iphone-view .results-search-box {
+            width: 100%;
+        }
+
+        body.iphone-view .results-container {
+            padding: 15px;
+        }
+
         @media (max-width: 768px) {
             .results-container {
                 padding: 20px;
@@ -524,6 +562,11 @@
     </div>
 
     <script>
+        // Device Detection
+        if (/iPhone|iPod/.test(navigator.userAgent)) {
+            document.body.classList.add('iphone-view');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('search-input');
             const searchBtn = document.getElementById('search-btn');
